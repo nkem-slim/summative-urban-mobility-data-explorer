@@ -36,14 +36,14 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/summative-app:${{ github.sha }}, ${{ secrets.DOCKER_USERNAME }}/summative-app:latest
           platforms: linux/arm64
 
-      - name: Push necessary files to the server
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "compose.yaml"
-          target: ${{vars.APP_HOME}}
+      # - name: Push necessary files to the server
+      #   uses: appleboy/scp-action@v1
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USERNAME }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     source: "compose.yaml"
+      #     target: ${{vars.APP_HOME}}
 
   deploy:
     needs: build-and-push
