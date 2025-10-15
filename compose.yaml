@@ -1,0 +1,47 @@
+name: summative
+
+networks:
+  net:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    # image: medatta0/summative:latest
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    networks:
+      - net
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mysql:8
+    env_file:
+      - .env
+
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+    volumes:
+      - data:/var/lib/mysql
+    ports:
+      - "3999:3306"
+    networks:
+      - net
+
+volumes:
+  data:
