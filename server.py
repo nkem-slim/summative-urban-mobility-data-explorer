@@ -21,14 +21,14 @@ def main():
     if args.storage == "file":
         from pathlib import Path
         storage = FileStorage(file_path="trips.json",
-                              input_file="data/train.csv")
+                              input_file="train.csv")
     else:
         Session = setup_db_session()  # your DB setup function
         db_instance = Session()
         print(db_instance)
 
         # Only load initial data if not in production restart
-        input_file = "data/train.csv" if not os.getenv("SKIP_DATA_LOAD") else None
+        input_file = "train.csv" if not os.getenv("SKIP_DATA_LOAD") else None
         storage = DBStorage(db_instance, input_file=input_file)
     app.config["STORAGE"] = storage
     not_production = os.getenv("PYTHON_ENV") != "PRODUCTION"

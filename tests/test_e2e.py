@@ -13,7 +13,7 @@ class FlaskE2ETestCaseWithFileStorage(unittest.TestCase):
         # Temp storage
         self.temp_file = NamedTemporaryFile(delete=False)
         self.storage = FileStorage(
-            self.temp_file.name, f"{os.getcwd()}/train.csv")
+            self.temp_file.name, "train.csv")
         app.config["STORAGE"] = self.storage
 
     def tearDown(self):

@@ -12,7 +12,7 @@ class FlaskE2ETestCaseWithDBStorage(unittest.TestCase):
         Session = setup_db_session()
         self.db_instance = Session()
         self.storage = DBStorage(
-            db_session=self.db_instance, input_file=f"{os.getcwd()}/data/train.csv")
+            db_session=self.db_instance, input_file="train.csv")
         app.config["STORAGE"] = self.storage
 
     def tearDown(self):
