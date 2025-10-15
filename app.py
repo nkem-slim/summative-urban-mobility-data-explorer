@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
-from clean import TripRecord  # or your Trip model
+from storage.models import TripRecord
+from storage.storage_adapters import DBStorage
 from flask import Flask, jsonify, request, g
+from utils.handler import handler
 from flasgger import Swagger
 
 load_dotenv()
@@ -58,6 +60,7 @@ def inject_storage():
 
 
 @app.route("/")
+@handler
 def health():
     """Health check endpoint
     ---
@@ -190,81 +193,157 @@ def add_trip():
 
 
 @app.route("/trips", methods=["GET"])
+@handler
 def list_trips():
-    """Get all trip records
+    """Get trip records with pagination
     ---
     tags:
       - Trips
-    summary: Retrieve all trip records
-    description: Returns a list of all trip records in the database
+    summary: Retrieve trip records with pagination
+    description: Returns a paginated list of trip records from the database
+    parameters:
+      - in: query
+        name: page
+        type: integer
+        default: 1
+        minimum: 1
+        description: Page number (1-based)
+        example: 1
+      - in: query
+        name: limit
+        type: integer
+        default: 10
+        minimum: 1
+        maximum: 1000
+        description: Number of trips per page
+        example: 10
     responses:
       200:
         description: List of trips successfully retrieved
         schema:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Trip ID
-                example: "id12345"
-              vendor_id:
-                type: integer
-                description: Vendor identifier
-                example: 1
-              pickup_datetime:
-                type: string
-                format: date-time
-                description: Pickup timestamp
-                example: "2023-01-15T10:30:00"
-              dropoff_datetime:
-                type: string
-                format: date-time
-                description: Dropoff timestamp
-                example: "2023-01-15T10:45:00"
-              passenger_count:
-                type: integer
-                description: Number of passengers
-                example: 2
-              pickup_longitude:
-                type: number
-                format: float
-                description: Pickup location longitude
-                example: -73.935242
-              pickup_latitude:
-                type: number
-                format: float
-                description: Pickup location latitude
-                example: 40.730610
-              dropoff_longitude:
-                type: number
-                format: float
-                description: Dropoff location longitude
-                example: -73.925242
-              dropoff_latitude:
-                type: number
-                format: float
-                description: Dropoff location latitude
-                example: 40.740610
-              store_and_fwd_flag:
-                type: string
-                description: Store and forward flag
-                example: "N"
-              trip_duration:
-                type: integer
-                description: Trip duration in seconds
-                example: 900
+          type: object
+          properties:
+            trips:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Trip ID
+                    example: "id12345"
+                  vendor_id:
+                    type: integer
+                    description: Vendor identifier
+                    example: 1
+                  pickup_datetime:
+                    type: string
+                    format: date-time
+                    description: Pickup timestamp
+                    example: "2023-01-15T10:30:00"
+                  dropoff_datetime:
+                    type: string
+                    format: date-time
+                    description: Dropoff timestamp
+                    example: "2023-01-15T10:45:00"
+                  passenger_count:
+                    type: integer
+                    description: Number of passengers
+                    example: 2
+                  pickup_longitude:
+                    type: number
+                    format: float
+                    description: Pickup location longitude
+                    example: -73.935242
+                  pickup_latitude:
+                    type: number
+                    format: float
+                    description: Pickup location latitude
+                    example: 40.730610
+                  dropoff_longitude:
+                    type: number
+                    format: float
+                    description: Dropoff location longitude
+                    example: -73.925242
+                  dropoff_latitude:
+                    type: number
+                    format: float
+                    description: Dropoff location latitude
+                    example: 40.740610
+                  store_and_fwd_flag:
+                    type: string
+                    description: Store and forward flag
+                    example: "N"
+                  trip_duration:
+                    type: integer
+                    description: Trip duration in seconds
+                    example: 900
+            pagination:
+              type: object
+              properties:
+                page:
+                  type: integer
+                  description: Current page number
+                  example: 1
+                limit:
+                  type: integer
+                  description: Number of items per page
+                  example: 10
+                total:
+                  type: integer
+                  description: Total number of items
+                  example: 100
+      400:
+        description: Invalid pagination parameters
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: "Invalid pagination parameters"
     """
-    trips = g.storage.list_trips()
-    # for i in range(4):
-    # print(trips[i])
-    return jsonify(trips)
+    # Get pagination parameters from query string
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    
+    # Validate parameters
+    if page < 1:
+        return jsonify({"error": "Page must be >= 1"}), 400
+    if limit < 1 or limit > 1000:
+        return jsonify({"error": "Limit must be between 1 and 1000"}), 400
+    
+    # Calculate offset
+    offset = (page - 1) * limit
+    
+    # Get trips with pagination
+    trips = g.storage.list_trips(offset=offset, limit=limit)
+
+
+    # For database storage 
+    if isinstance(g.storage, DBStorage):
+        from storage.models import TripModel
+        total = g.storage.db.query(TripModel).count()
+    else:
+        # File storage - load all and count
+        all_trips = g.storage.list_trips()
+        total = len(all_trips)
+    
+    response = {
+        "trips": trips,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total
+        }
+    }
+    
+    return jsonify(response)
 
 # Example /trips/<id> endpoint
 
 
 @app.route("/trips/<trip_id>", methods=["GET"])
+@handler
 def get_trip(trip_id):
     """Get a specific trip by ID
     ---

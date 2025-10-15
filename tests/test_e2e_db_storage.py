@@ -1,7 +1,8 @@
 import unittest
 from server import app
-from storage_adapters import DBStorage
-from db_setup import setup_db_session
+from storage.storage_adapters import DBStorage
+from storage.db_setup import setup_db_session
+import os
 
 
 class FlaskE2ETestCaseWithDBStorage(unittest.TestCase):
@@ -11,7 +12,7 @@ class FlaskE2ETestCaseWithDBStorage(unittest.TestCase):
         Session = setup_db_session()
         self.db_instance = Session()
         self.storage = DBStorage(
-            db_session=self.db_instance, input_file="train.csv")
+            db_session=self.db_instance, input_file=f"{os.getcwd()}/data/train.csv")
         app.config["STORAGE"] = self.storage
 
     def tearDown(self):

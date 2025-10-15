@@ -1,8 +1,8 @@
-from models import TripModel  # SQLAlchemy ORM model
+from .models import TripModel
 from sqlalchemy.exc import NoResultFound
-from storage import StorageAdapter
+from .storage import StorageAdapter
 from pathlib import Path
-from clean import clean_data
+from utils.clean import clean_data
 import json
 from sqlalchemy import delete
 
@@ -35,8 +35,11 @@ class FileStorage(StorageAdapter):
         trips = self._load()
         return next((t for t in trips if t["id"] == trip_id), None)
 
-    def list_trips(self):
-        return self._load()
+    def list_trips(self, offset=0, limit=None):
+        trips = self._load()
+        if limit is None:
+            return trips[offset:]
+        return trips[offset:offset + limit]
 
     def delete_trip(self, trip_id: str):
         trips = self._load()
@@ -77,11 +80,14 @@ class DBStorage(StorageAdapter):
             return trip.to_dict()
         return None
 
-    def list_trips(self) -> list[dict]:
+    def list_trips(self, offset=0, limit=None) -> list[dict]:
         """
-        List all trips in the database.
+        List trips in the database with pagination.
         """
-        trips = self.db.query(TripModel).all()
+        query = self.db.query(TripModel).offset(offset)
+        if limit is not None:
+            query = query.limit(limit)
+        trips = query.all()
         return [trip.to_dict() for trip in trips]
 
     def delete_trip(self, trip_id: str):

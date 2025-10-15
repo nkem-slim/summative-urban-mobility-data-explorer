@@ -1,7 +1,7 @@
 import csv
 import json
 from os import getenv
-from models import TripRecord, TripModel  # Pydantic + SQLAlchemy
+from storage.models import TripRecord, TripModel
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 

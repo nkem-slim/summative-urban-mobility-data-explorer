@@ -1,7 +1,8 @@
 import argparse
+import os
 from app import app
-from storage_adapters import FileStorage, DBStorage
-from db_setup import setup_db_session
+from storage.storage_adapters import FileStorage, DBStorage
+from storage.db_setup import setup_db_session
 
 storage = None
 
@@ -19,16 +20,19 @@ def main():
     # print(args)
     if args.storage == "file":
         from pathlib import Path
-        storage = FileStorage(file_path="trips.json")
+        storage = FileStorage(file_path="trips.json",
+                              input_file="data/train.csv")
     else:
-        # setup DB session here, e.g., SQLAlchemy
         Session = setup_db_session()  # your DB setup function
         db_instance = Session()
         print(db_instance)
-        # storage = DBStorage(db_instance, input_file="train.csv")
-        storage = DBStorage(db_instance)
+
+        # Only load initial data if not in production restart
+        input_file = "data/train.csv" if not os.getenv("SKIP_DATA_LOAD") else None
+        storage = DBStorage(db_instance, input_file=input_file)
     app.config["STORAGE"] = storage
-    app.run(debug=True, port=5000)
+    not_production = os.getenv("PYTHON_ENV") != "PRODUCTION"
+    app.run(debug=not_production, host='0.0.0.0', port=5000)
 
 
 if __name__ == "__main__":
