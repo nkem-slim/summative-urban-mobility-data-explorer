@@ -4,6 +4,7 @@ import os
 from storage.models import TripRecord, TripModel
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
+from time import sleep
 
 
 def validate_row(data: dict, seen_ids: set):
@@ -62,6 +63,7 @@ def to_db(input_csv: str, session: Session, batch_size: int = 10000):
                 save_many_trips(session, batch)
                 total_inserted += len(batch)
                 batch.clear()
+                sleep(2)
 
             if os.getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
                 break
@@ -111,6 +113,7 @@ def to_file(input_csv: str, output_json: str):
                 break
 
             if total % 10_000 == 0:
+                sleep(2)
                 print(f"Processed {total:,} trips so far...")
 
         output_stream.write("\n]")
