@@ -121,10 +121,11 @@ def to_file(input_csv: str, output_json: str):
 def clean_data(input_csv: str, output_json: str = None, session: Session = None):
     """Entry point — choose between DB or File mode."""
     input_csv_path = f"{os.getcwd()}/data/{input_csv}"
+    print(input_csv_path)
     if session:
-        to_db(input_csv, session)
+        to_db(input_csv_path, session)
     elif output_json:
-        to_file(input_csv, output_json)
+        to_file(input_csv_path, output_json)
     else:
         raise ValueError(
             "Provide either a SQLAlchemy session or an output JSON path.")
