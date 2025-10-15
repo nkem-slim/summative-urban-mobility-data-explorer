@@ -6,10 +6,10 @@ networks:
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: dockerfile
-    # image: medatta0/summative:latest
+    # build:
+    # context: .
+    # dockerfile: dockerfile
+    image: medatta0/summative-app:latest
     env_file:
       - .env
     volumes:

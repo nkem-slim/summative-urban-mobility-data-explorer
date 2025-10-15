@@ -34,7 +34,6 @@ jobs:
           file: ./dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/summative-app:${{ github.sha }}, ${{ secrets.DOCKER_USERNAME }}/summative-app:latest
-          platforms: linux/arm64
 
       # - name: Push necessary files to the server
       #   uses: appleboy/scp-action@v1
