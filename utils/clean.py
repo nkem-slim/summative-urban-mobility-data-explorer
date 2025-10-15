@@ -65,7 +65,7 @@ def to_db(input_csv: str, session: Session, batch_size: int = 10000):
                 batch.clear()
                 sleep(2)
 
-            if os.getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
+            if os.getenv("PYTHON_ENV") == "PRODUCTION" and i == insertion_limit:
                 break
 
             if total_inserted % 10_000 == 0:
@@ -109,7 +109,7 @@ def to_file(input_csv: str, output_json: str):
             first = False
             total += 1
 
-            if os.getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
+            if os.getenv("PYTHON_ENV") == "PRODUCTION" and i == insertion_limit:
                 break
 
             if total % 10_000 == 0:
