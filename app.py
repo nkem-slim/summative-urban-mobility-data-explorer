@@ -1,9 +1,9 @@
-# from dotenv import load_dotenv
-from storage import StorageAdapter
+from dotenv import load_dotenv
 from clean import TripRecord  # or your Trip model
 from flask import Flask, jsonify, request, g
 from flasgger import Swagger
-# load_dotenv()
+
+load_dotenv()
 
 
 app = Flask(__name__)

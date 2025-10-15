@@ -107,11 +107,11 @@ def to_file(input_csv: str, output_json: str):
             first = False
             total += 1
 
-            # if getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
-            #     break
+            if getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
+                break
 
-            # if total % 10_000 == 0:
-            #     print(f"Processed {total:,} trips so far...")
+            if total % 10_000 == 0:
+                print(f"Processed {total:,} trips so far...")
 
         output_stream.write("\n]")
 
