@@ -1,9 +1,10 @@
 import csv
 import json
-from os import getenv
-from models import TripRecord, TripModel  # Pydantic + SQLAlchemy
+import os
+from storage.models import TripRecord, TripModel
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
+from time import sleep
 
 
 def validate_row(data: dict, seen_ids: set):
@@ -62,12 +63,13 @@ def to_db(input_csv: str, session: Session, batch_size: int = 10000):
                 save_many_trips(session, batch)
                 total_inserted += len(batch)
                 batch.clear()
+                sleep(2)
 
-            # if getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
-            #     break
+            if os.getenv("PYTHON_ENV") == "PRODUCTION" and i == insertion_limit:
+                break
 
-            # if total_inserted % 10_000 == 0:
-            #     print(f"Inserted {total_inserted:,} trips so far...")
+            if total_inserted % 10_000 == 0:
+                print(f"Inserted {total_inserted:,} trips so far...")
 
         # Handle remaining batch
         if batch:
@@ -107,11 +109,12 @@ def to_file(input_csv: str, output_json: str):
             first = False
             total += 1
 
-            # if getenv("PYTHON_ENV") != "PRODUCTION" and i == insertion_limit:
-            #     break
+            if os.getenv("PYTHON_ENV") == "PRODUCTION" and i == insertion_limit:
+                break
 
-            # if total % 10_000 == 0:
-            #     print(f"Processed {total:,} trips so far...")
+            if total % 10_000 == 0:
+                sleep(2)
+                print(f"Processed {total:,} trips so far...")
 
         output_stream.write("\n]")
 
@@ -120,10 +123,12 @@ def to_file(input_csv: str, output_json: str):
 
 def clean_data(input_csv: str, output_json: str = None, session: Session = None):
     """Entry point — choose between DB or File mode."""
+    input_csv_path = f"{os.getcwd()}/data/{input_csv}"
+    print(input_csv_path)
     if session:
-        to_db(input_csv, session)
+        to_db(input_csv_path, session)
     elif output_json:
-        to_file(input_csv, output_json)
+        to_file(input_csv_path, output_json)
     else:
         raise ValueError(
             "Provide either a SQLAlchemy session or an output JSON path.")
