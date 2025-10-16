@@ -6,11 +6,16 @@ from flask import Flask, jsonify, request, g
 from utils.handler import handler
 from flasgger import Swagger
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+import os
 
 load_dotenv()
 
 
 app = Flask(__name__)
+
+jwt = JWTManager(app)
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
 CORS(app)
 session = LimiterSession(per_hour=20)
@@ -64,6 +69,37 @@ def inject_storage():
     g.storage = app.config.get("STORAGE")
 
 
+@app.route("/login", methods=["POST"])
+@handler
+def login():
+    """Login endpoint
+    ---
+    tags:
+      - Authentication
+    summary: Login
+    description: Return object with username and token
+    responses:
+      200:
+        description:
+        schema:
+        type: object
+          properties:
+            message:
+              type: string
+              example: "Vincent"
+            token:
+              type: string
+              example: "jwt.token.example"
+    """
+
+    username = request.json.get("username", None)
+    password = request.json.get("password", None)
+    if not username or not password:
+        return jsonify({"message": "Bad username or password"}), 401
+    access_token = create_access_token(identity=username)
+    return jsonify({"username": username, "token": access_token})
+
+
 @app.route("/")
 @handler
 def health():
@@ -84,6 +120,7 @@ def health():
 
 
 @app.route("/trips", methods=["POST"])
+@jwt_required
 def add_trip():
     """Add a new trip record
     ---
@@ -198,6 +235,7 @@ def add_trip():
 
 
 @app.route("/trips", methods=["GET"])
+@jwt_required
 @handler
 def list_trips():
     """Get trip records with pagination
@@ -347,6 +385,7 @@ def list_trips():
 
 
 @app.route("/trips/<trip_id>", methods=["GET"])
+@jwt_required
 @handler
 def get_trip(trip_id):
     """Get a specific trip by ID
