@@ -18,6 +18,7 @@ class TripRecord(BaseModel):
     dropoff_latitude: float = Field(ge=-90, le=90)
     store_and_fwd_flag: str
     trip_duration: int
+    distance: float = Field(ge=0, description="Distance in kilometers")
 
     @field_validator("id")
     @classmethod
@@ -35,18 +36,18 @@ class TripModel(Base):
     __tablename__ = "trips"
 
     id: Mapped[str] = mapped_column(String(50), primary_key=True)
-    vendor_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    pickup_datetime: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    vendor_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    pickup_datetime: Mapped[datetime] = mapped_column(DateTime, nullable=False, index=True)
     dropoff_datetime: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False)
+        DateTime, nullable=False, index=True)
     passenger_count: Mapped[int] = mapped_column(Integer, nullable=False)
     pickup_longitude: Mapped[float] = mapped_column(Float, nullable=False)
     pickup_latitude: Mapped[float] = mapped_column(Float, nullable=False)
     dropoff_longitude: Mapped[float] = mapped_column(Float, nullable=False)
     dropoff_latitude: Mapped[float] = mapped_column(Float, nullable=False)
     store_and_fwd_flag: Mapped[str] = mapped_column(String(1), nullable=False)
-    trip_duration: Mapped[int] = mapped_column(Integer, nullable=False)
-    distance: Mapped[float] = mapped_column(Integer, nullable=False)
+    trip_duration: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    distance: Mapped[float] = mapped_column(Float, nullable=False, index=True)
 
     def to_dict(self):
         return {
@@ -61,4 +62,5 @@ class TripModel(Base):
             "dropoff_latitude": self.dropoff_latitude,
             "store_and_fwd_flag": self.store_and_fwd_flag,
             "trip_duration": self.trip_duration,
+            "distance": self.distance,
         }

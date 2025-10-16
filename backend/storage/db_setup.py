@@ -11,11 +11,11 @@ def setup_db_session():
     MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE
     """
 
-    user = os.getenv("MYSQL_USER")
-    password = os.getenv("MYSQL_PASSWORD")
-    host = os.getenv("MYSQL_HOST")
-    port = int(os.getenv("MYSQL_PORT"))
-    database = os.getenv("MYSQL_DATABASE")
+    user = os.getenv("MYSQL_USER", "admin")
+    password = os.getenv("MYSQL_PASSWORD", "adminpass")
+    host = os.getenv("MYSQL_HOST", "localhost")
+    port = int(os.getenv("MYSQL_PORT", "3306"))
+    database = os.getenv("MYSQL_DATABASE", "trips_db")
     # print(user, password, host, port, database)
 
     db_url = f"mysql+pymysql://{user}:{password}@{host}:{port}/{database}"

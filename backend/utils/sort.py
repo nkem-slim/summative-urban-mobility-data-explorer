@@ -1,7 +1,13 @@
 from typing import List
 
 def sort_trip_records(data: List[dict], field: str) -> List[dict]:
+    if not field or not data:
+        return data
+    
     sorted_data = data.copy()
+    
+    if field not in sorted_data[0]:
+        return sorted_data
     
     # Bubble sort
     n = len(sorted_data)

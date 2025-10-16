@@ -2,15 +2,23 @@
 --We use appropriate data types for each column to ensure data integrity and optimize storage.
 
 CREATE TABLE trips (
-    trip_id VARCHAR(100) PRIMARY KEY, --Using the original ID from the dataset
-    vendor_id TINYINT FOREIGN KEY, --Supposed to reference the vendor table, but we don't have that table in this dataset
+    id VARCHAR(50) PRIMARY KEY, --Using the original ID from the dataset
+    vendor_id INT NOT NULL,
     pickup_datetime DATETIME NOT NULL,
     dropoff_datetime DATETIME NOT NULL,
-    passenger_count TINYINT,
-    pickup_longitude DECIMAL(11, 8),
-    pickup_latitude DECIMAL(10, 8),
-    dropoff_longitude DECIMAL(11, 8),
-    dropoff_latitude DECIMAL(10, 8),
+    passenger_count INT,
+    pickup_longitude FLOAT,
+    pickup_latitude FLOAT,
+    dropoff_longitude FLOAT,
+    dropoff_latitude FLOAT,
     store_and_fwd_flag CHAR(1),
-    trip_duration FLOAT,
+    trip_duration INT,
+    distance FLOAT
 );
+
+CREATE INDEX idx_vendor_id ON trips(vendor_id);
+CREATE INDEX idx_pickup_datetime ON trips(pickup_datetime);
+CREATE INDEX idx_dropoff_datetime ON trips(dropoff_datetime);
+CREATE INDEX idx_trip_duration ON trips(trip_duration);
+CREATE INDEX idx_distance ON trips(distance);
+

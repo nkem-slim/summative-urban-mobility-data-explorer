@@ -58,9 +58,9 @@ def to_db(input_csv: str, session: Session, batch_size: int = 10000):
                 error_stream.write("\n")
                 continue
             
-            # print(row)
+            # Calculate distance between pickup and dropoff points
             lat_1, lon_1 = validated["pickup_latitude"], validated["pickup_longitude"]
-            lat_2, lon_2 = validated["dropoff_longitude"], validated["dropoff_latitude"]
+            lat_2, lon_2 = validated["dropoff_latitude"], validated["dropoff_longitude"]
             distance = haversine((lat_1, lon_1), (lat_2, lon_2))
 
             validated.distance = distance
@@ -113,8 +113,9 @@ def to_file(input_csv: str, output_json: str):
             if not first:
                 output_stream.write(",\n")
 
+            # Calculate distance between pickup and dropoff points
             lat_1, lon_1 = validated["pickup_latitude"], validated["pickup_longitude"]
-            lat_2, lon_2 = validated["dropoff_longitude"], validated["dropoff_latitude"]
+            lat_2, lon_2 = validated["dropoff_latitude"], validated["dropoff_longitude"]
             distance = haversine((lat_1, lon_1), (lat_2, lon_2))
 
             validated.distance = distance

@@ -80,11 +80,11 @@ def login():
     description: Return object with username and token
     responses:
       200:
-        description:
+        description: Login successful
         schema:
-        type: object
+          type: object
           properties:
-            message:
+            username:
               type: string
               example: "Vincent"
             token:
@@ -147,6 +147,7 @@ def add_trip():
             - dropoff_latitude
             - store_and_fwd_flag
             - trip_duration
+            - distance
           properties:
             id:
               type: string
@@ -206,6 +207,12 @@ def add_trip():
               type: integer
               description: Trip duration in seconds
               example: 900
+            distance:
+              type: number
+              format: float
+              minimum: 0
+              description: Distance in kilometers
+              example: 2.5
     responses:
       201:
         description: Trip successfully created
@@ -321,6 +328,11 @@ def list_trips():
                     type: integer
                     description: Trip duration in seconds
                     example: 900
+                  distance:
+                    type: number
+                    format: float
+                    description: Distance in kilometers
+                    example: 2.5
             pagination:
               type: object
               properties:
@@ -460,6 +472,11 @@ def get_trip(trip_id):
               type: integer
               description: Trip duration in seconds
               example: 900
+            distance:
+              type: number
+              format: float
+              description: Distance in kilometers
+              example: 2.5
       404:
         description: Trip not found
         schema:
