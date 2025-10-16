@@ -5,12 +5,11 @@ import mockDataService from "./mockDataService.jsx";
 // Note: Using plain JavaScript objects instead of TypeScript interfaces
 // Types are defined in JSDoc comments in ../types/index.jsx for documentation
 
-// const API_BASE_URL =
-//   process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_BASE_URL = import.meta.env.REACT_APP_API_URL;
 // Force using mock data for now since backend is not ready
 const USE_MOCK_DATA = true;
 // const USE_MOCK_DATA =
-//   process.env.NODE_ENV === "development" || !process.env.REACT_APP_API_URL;
+//   import.meta.env.MODE === "development" || !import.meta.env.REACT_APP_API_URL;
 
 class DataService {
   /**
@@ -19,29 +18,31 @@ class DataService {
    * @param {RequestInit} options - Request options
    * @returns {Promise<any>} Response data
    */
-  // async makeRequest(endpoint, options = {}) {
-  //   const url = `${API_BASE_URL}${endpoint}`;
-  //   const config = {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       ...options.headers,
-  //     },
-  //     ...options,
-  //   };
+  async makeRequest(endpoint) {
+    const url = `${endpoint}`;
+    console.log(url);
+    // const config = {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     ...options.headers,
+    //   },
+    //   ...options,
+    // };
 
-  //   try {
-  //     const response = await fetch(url, config);
+    try {
+      // const response = await fetch(url, config);
+      const response = await fetch(url);
 
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-  //     return await response.json();
-  //   } catch (error) {
-  //     console.error("API request failed:", error);
-  //     throw error;
-  //   }
-  // }
+      return await response.json();
+    } catch (error) {
+      console.error("API request failed:", error);
+      throw error;
+    }
+  }
 
   /**
    * Get trips with filtering, sorting, and pagination

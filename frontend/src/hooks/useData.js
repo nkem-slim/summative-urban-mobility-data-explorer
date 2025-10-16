@@ -30,8 +30,17 @@ export const useTrips = () => {
     }
   }, [filters, sort, pagination, setLoading, setError, setTrips]);
 
+  const getTrips = async () => {
+    const response = await dataService.makeRequest("trips", {
+      options: { limit: 10 },
+    });
+    console.log("API DATA");
+    console.log(response.json());
+  };
+
   useEffect(() => {
     fetchTrips();
+    getTrips();
   }, [fetchTrips]);
 
   return {

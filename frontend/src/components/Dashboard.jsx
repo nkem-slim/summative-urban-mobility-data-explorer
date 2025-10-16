@@ -9,6 +9,8 @@ import {
 import MetricsCard from "./MetricsCard";
 import Chart from "./Chart";
 import LoadingSpinner from "./LoadingSpinner";
+import { useEffect } from "react";
+import { dataService } from "../services/dataService.jsx";
 
 const Dashboard = () => {
   const {
@@ -19,6 +21,23 @@ const Dashboard = () => {
   const { fetchChartData: fetchHourlyData } = useChartData("hourly");
   const { fetchChartData: fetchBoroughData } = useChartData("borough");
   const { fetchChartData: fetchPaymentData } = useChartData("payment");
+
+  const getTrips = async () => {
+    try {
+      const response = await dataService.makeRequest(
+        "http://167.99.192.151:5000/trips"
+      );
+      console.log("API DATA");
+      console.log(response);
+    } catch (error) {
+      console.error("Error fetching trips:", error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("API DATA TEST");
+    getTrips();
+  }, []);
 
   if (metricsLoading) {
     return <LoadingSpinner />;
