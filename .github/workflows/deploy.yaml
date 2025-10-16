@@ -30,8 +30,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./dockerfile
+          context: ./backend
+          file: ./backend/dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/summative-app:${{ github.sha }}, ${{ secrets.DOCKER_USERNAME }}/summative-app:latest
 
