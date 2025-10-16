@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from storage.models import TripRecord
+from requests_ratelimiter import LimiterSession
 from storage.storage_adapters import DBStorage
 from flask import Flask, jsonify, request, g
 from utils.handler import handler
@@ -9,6 +10,8 @@ load_dotenv()
 
 
 app = Flask(__name__)
+
+session = LimiterSession(per_hour=20)
 
 # Configure Swagger with custom template and info
 swagger_config = {
@@ -305,21 +308,20 @@ def list_trips():
     # Get pagination parameters from query string
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
-    
+
     # Validate parameters
     if page < 1:
         return jsonify({"error": "Page must be >= 1"}), 400
     if limit < 1 or limit > 1000:
         return jsonify({"error": "Limit must be between 1 and 1000"}), 400
-    
+
     # Calculate offset
     offset = (page - 1) * limit
-    
+
     # Get trips with pagination
     trips = g.storage.list_trips(offset=offset, limit=limit)
 
-
-    # For database storage 
+    # For database storage
     if isinstance(g.storage, DBStorage):
         from storage.models import TripModel
         total = g.storage.db.query(TripModel).count()
@@ -327,7 +329,7 @@ def list_trips():
         # File storage - load all and count
         all_trips = g.storage.list_trips()
         total = len(all_trips)
-    
+
     response = {
         "trips": trips,
         "pagination": {
@@ -336,7 +338,7 @@ def list_trips():
             "total": total
         }
     }
-    
+
     return jsonify(response)
 
 # Example /trips/<id> endpoint
