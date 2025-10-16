@@ -120,7 +120,7 @@ def health():
 
 
 @app.route("/trips", methods=["POST"])
-@jwt_required
+# @jwt_required
 def add_trip():
     """Add a new trip record
     ---
@@ -235,7 +235,7 @@ def add_trip():
 
 
 @app.route("/trips", methods=["GET"])
-@jwt_required
+# @jwt_required
 @handler
 def list_trips():
     """Get trip records with pagination
@@ -385,7 +385,7 @@ def list_trips():
 
 
 @app.route("/trips/<trip_id>", methods=["GET"])
-@jwt_required
+# @jwt_required
 @handler
 def get_trip(trip_id):
     """Get a specific trip by ID

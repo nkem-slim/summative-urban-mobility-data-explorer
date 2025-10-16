@@ -13,5 +13,5 @@ RUN uv venv && uv sync --no-cache
 
 COPY . .
 
-# Use gunicorn from .venv 
-CMD ["/app/.venv/bin/gunicorn", "server:app", "--bind", "0.0.0.0:5000"]
+# CMD ["/app/.venv/bin/gunicorn", "server:app", "--bind", "0.0.0.0:5000"]
+CMD [ "/app/.venv/bin/python", "server.py" ]
