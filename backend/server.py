@@ -29,7 +29,7 @@ def main():
         csv_file_path = "data/train.csv"
         import os
         if os.path.exists(csv_file_path):
-            storage = DBStorage(db_instance, input_file="train.csv")
+            storage = DBStorage(db_instance, input_file=csv_file_path)
         else:
             print(f"Warning: CSV file {csv_file_path} not found. Starting with empty database.")
             storage = DBStorage(db_instance)

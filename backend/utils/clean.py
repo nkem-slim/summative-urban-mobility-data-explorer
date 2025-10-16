@@ -45,43 +45,53 @@ def to_db(input_csv: str, session: Session, batch_size: int = 10000):
     insertion_limit = 10000
     seen_ids = set()
 
-    with open(input_csv, "r", newline="", encoding="utf-8") as csv_file, \
-            open("incorrect.json", "w", encoding="utf-8") as error_stream:
+    try:
+        with open(input_csv, "r", newline="", encoding="utf-8") as csv_file, \
+                open("incorrect.json", "w", encoding="utf-8") as error_stream:
 
-        reader = csv.DictReader(csv_file)
+            reader = csv.DictReader(csv_file)
 
-        for i, row in enumerate(reader, start=1):
-            validated, errors = validate_row(row, seen_ids)
-            if errors:
-                total_errors += 1
-                json.dump({"row": row, "errors": errors}, error_stream)
-                error_stream.write("\n")
-                continue
-            
-            # Calculate distance between pickup and dropoff points
-            lat_1, lon_1 = validated["pickup_latitude"], validated["pickup_longitude"]
-            lat_2, lon_2 = validated["dropoff_latitude"], validated["dropoff_longitude"]
-            distance = haversine((lat_1, lon_1), (lat_2, lon_2))
+            for i, row in enumerate(reader, start=1):
+                validated, errors = validate_row(row, seen_ids)
+                if errors:
+                    total_errors += 1
+                    json.dump({"row": row, "errors": errors}, error_stream)
+                    error_stream.write("\n")
+                    continue
+                
+                # Calculate distance between pickup and dropoff points
+                lat_1, lon_1 = validated["pickup_latitude"], validated["pickup_longitude"]
+                lat_2, lon_2 = validated["dropoff_latitude"], validated["dropoff_longitude"]
+                distance = haversine((lat_1, lon_1), (lat_2, lon_2))
 
-            validated.distance = distance
-            batch.append(validated.model_dump())
-            
-            if len(batch) >= batch_size:
+                validated.distance = distance
+                batch.append(validated.model_dump())
+                
+                if len(batch) >= batch_size:
+                    save_many_trips(session, batch)
+                    total_inserted += len(batch)
+                    batch.clear()
+                    sleep(2)
+
+                if os.getenv("PYTHON_ENV") == "PRODUCTION" and i == insertion_limit:
+                    break
+
+                if total_inserted % 10_000 == 0:
+                    print(f"Inserted {total_inserted:,} trips so far...")
+
+            # Handle remaining batch
+            if batch:
                 save_many_trips(session, batch)
                 total_inserted += len(batch)
-                batch.clear()
-                sleep(2)
 
-            if os.getenv("PYTHON_ENV") == "PRODUCTION" and i == insertion_limit:
-                break
-
-            if total_inserted % 10_000 == 0:
-                print(f"Inserted {total_inserted:,} trips so far...")
-
-        # Handle remaining batch
-        if batch:
-            save_many_trips(session, batch)
-            total_inserted += len(batch)
+    except FileNotFoundError as e:
+        print(f"❌ Error: CSV file not found: {input_csv}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Looking for file: {input_csv}")
+        raise e
+    except Exception as e:
+        print(f"❌ Error processing CSV file: {e}")
+        raise e
 
     print(
         f"✅ Done! {total_inserted:,} trips inserted, {total_errors:,} errors logged.")
@@ -137,8 +147,13 @@ def to_file(input_csv: str, output_json: str):
 
 def clean_data(input_csv: str, output_json: str = None, session: Session = None):
     """Entry point — choose between DB or File mode."""
-    input_csv_path = f"{os.getcwd()}/data/{input_csv}"
-    print(input_csv_path)
+    # Handle both full paths and just filenames
+    if input_csv.startswith("data/"):
+        input_csv_path = input_csv
+    else:
+        input_csv_path = f"{os.getcwd()}/data/{input_csv}"
+    
+    print(f"Processing CSV file: {input_csv_path}")
     if session:
         to_db(input_csv_path, session)
     elif output_json:
