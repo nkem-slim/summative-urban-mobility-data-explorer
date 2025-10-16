@@ -5,12 +5,14 @@ from storage.storage_adapters import DBStorage
 from flask import Flask, jsonify, request, g
 from utils.handler import handler
 from flasgger import Swagger
+from flask_cors import CORS
 
 load_dotenv()
 
 
 app = Flask(__name__)
 
+CORS(app)
 session = LimiterSession(per_hour=20)
 
 # Configure Swagger with custom template and info
