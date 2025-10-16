@@ -5,6 +5,7 @@ from storage.models import TripRecord, TripModel
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from time import sleep
+from haversine import haversine
 
 
 def validate_row(data: dict, seen_ids: set):
@@ -56,9 +57,15 @@ def to_db(input_csv: str, session: Session, batch_size: int = 10000):
                 json.dump({"row": row, "errors": errors}, error_stream)
                 error_stream.write("\n")
                 continue
+            
+            # print(row)
+            lat_1, lon_1 = validated["pickup_latitude"], validated["pickup_longitude"]
+            lat_2, lon_2 = validated["dropoff_longitude"], validated["dropoff_latitude"]
+            distance = haversine((lat_1, lon_1), (lat_2, lon_2))
 
+            validated.distance = distance
             batch.append(validated.model_dump())
-
+            
             if len(batch) >= batch_size:
                 save_many_trips(session, batch)
                 total_inserted += len(batch)
@@ -105,6 +112,12 @@ def to_file(input_csv: str, output_json: str):
 
             if not first:
                 output_stream.write(",\n")
+
+            lat_1, lon_1 = validated["pickup_latitude"], validated["pickup_longitude"]
+            lat_2, lon_2 = validated["dropoff_longitude"], validated["dropoff_latitude"]
+            distance = haversine((lat_1, lon_1), (lat_2, lon_2))
+
+            validated.distance = distance
             json.dump(validated.model_dump(mode="json"), output_stream)
             first = False
             total += 1

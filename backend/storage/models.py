@@ -46,6 +46,7 @@ class TripModel(Base):
     dropoff_latitude: Mapped[float] = mapped_column(Float, nullable=False)
     store_and_fwd_flag: Mapped[str] = mapped_column(String(1), nullable=False)
     trip_duration: Mapped[int] = mapped_column(Integer, nullable=False)
+    distance: Mapped[float] = mapped_column(Integer, nullable=False)
 
     def to_dict(self):
         return {
