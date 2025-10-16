@@ -16,4 +16,4 @@ RUN uv sync --no-cache
 
 COPY . .
 
-CMD ["uv", "run", "python", "server.py"]
+CMD ["gunicorn", "serve:app", "--bind", "0.0.0.0:8000"]
