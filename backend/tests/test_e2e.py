@@ -1,7 +1,8 @@
 import unittest
 from app import app
-from storage_adapters import FileStorage
+from storage.storage_adapters import FileStorage
 from tempfile import NamedTemporaryFile
+import os
 
 
 class FlaskE2ETestCaseWithFileStorage(unittest.TestCase):
@@ -11,7 +12,8 @@ class FlaskE2ETestCaseWithFileStorage(unittest.TestCase):
 
         # Temp storage
         self.temp_file = NamedTemporaryFile(delete=False)
-        self.storage = FileStorage(self.temp_file.name, "train.csv")
+        self.storage = FileStorage(
+            self.temp_file.name, "train.csv")
         app.config["STORAGE"] = self.storage
 
     def tearDown(self):

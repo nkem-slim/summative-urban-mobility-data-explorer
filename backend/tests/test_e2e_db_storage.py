@@ -1,7 +1,8 @@
 import unittest
 from server import app
-from storage_adapters import DBStorage
-from db_setup import setup_db_session
+from storage.storage_adapters import DBStorage
+from storage.db_setup import setup_db_session
+import os
 
 
 class FlaskE2ETestCaseWithDBStorage(unittest.TestCase):

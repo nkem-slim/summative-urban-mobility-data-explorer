@@ -14,7 +14,7 @@ class StorageAdapter(ABC):
         pass
 
     @abstractmethod
-    def list_trips(self) -> List[Dict]:
+    def list_trips(self, offset=0, limit=None) -> List[Dict]:
         pass
 
     @abstractmethod
