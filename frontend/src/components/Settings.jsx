@@ -1,9 +1,9 @@
 // Settings component for application configuration
 import { useState } from "react";
-import { useDataExport } from "../hooks/useData.jsx";
+// import { useDataExport } from "../hooks/useData.jsx";
 
 const Settings = () => {
-  const { exportData } = useDataExport();
+  // const { exportData } = useDataExport();
   const [settings, setSettings] = useState({
     theme: "light",
     language: "en",
@@ -21,34 +21,34 @@ const Settings = () => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleExportSettings = () => {
-    const settingsJson = JSON.stringify(settings, null, 2);
-    const blob = new Blob([settingsJson], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "nyc-mobility-settings.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+  // const handleExportSettings = () => {
+  //   const settingsJson = JSON.stringify(settings, null, 2);
+  //   const blob = new Blob([settingsJson], { type: "application/json" });
+  //   const url = URL.createObjectURL(blob);
+  //   const a = document.createElement("a");
+  //   a.href = url;
+  //   a.download = "nyc-mobility-settings.json";
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  //   URL.revokeObjectURL(url);
+  // };
 
-  const handleImportSettings = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const importedSettings = JSON.parse(e.target.result);
-          setSettings((prev) => ({ ...prev, ...importedSettings }));
-        } catch (error) {
-          alert("Error importing settings file");
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
+  // const handleImportSettings = (event) => {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       try {
+  //         const importedSettings = JSON.parse(e.target.result);
+  //         setSettings((prev) => ({ ...prev, ...importedSettings }));
+  //       } catch (error) {
+  //         alert("Error importing settings file");
+  //       }
+  //     };
+  //     reader.readAsText(file);
+  //   }
+  // };
 
   return (
     <div className="space-y-6">
@@ -113,7 +113,7 @@ const Settings = () => {
             </select>
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Currency
             </label>
@@ -126,7 +126,7 @@ const Settings = () => {
               <option value="EUR">EUR (€)</option>
               <option value="GBP">GBP (£)</option>
             </select>
-          </div>
+          </div> */}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -188,7 +188,7 @@ const Settings = () => {
             />
           </div>
 
-          {settings.autoRefresh && (
+          {/* {settings.autoRefresh && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Refresh Interval (seconds)
@@ -207,7 +207,7 @@ const Settings = () => {
                 className="input-field"
               />
             </div>
-          )}
+          )} */}
 
           <div className="flex items-center justify-between">
             <div>
@@ -250,7 +250,7 @@ const Settings = () => {
       </div>
 
       {/* Export/Import Settings */}
-      <div className="card">
+      {/* <div className="card">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           Settings Management
         </h3>
@@ -268,10 +268,10 @@ const Settings = () => {
             />
           </label>
         </div>
-      </div>
+      </div> */}
 
       {/* Data Export */}
-      <div className="card">
+      {/* <div className="card">
         <h3 className="text-lg font-medium text-gray-900 mb-4">Data Export</h3>
         <div className="space-y-4">
           <p className="text-sm text-gray-500">
@@ -289,10 +289,10 @@ const Settings = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* API Settings */}
-      <div className="card">
+      {/* <div className="card">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           API Configuration
         </h3>
@@ -301,20 +301,20 @@ const Settings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               API Base URL
             </label>
-            {/* <input
+            <input
               type="url"
               value={
                 process.env.REACT_APP_API_URL || "http://localhost:5000/api"
               }
               disabled
               className="input-field bg-gray-50"
-            /> */}
+            />
             <p className="text-sm text-gray-500 mt-1">
               Configure this in your environment variables
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

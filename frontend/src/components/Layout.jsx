@@ -35,8 +35,8 @@ const Layout = ({ children }) => {
         />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4">
-            <h1 className="text-xl font-bold text-gray-900">
-              NYC Mobility Explorer
+            <h1 className="text-base font-bold text-gray-900">
+              NYC UMDE by ADVENTURE
             </h1>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -73,7 +73,7 @@ const Layout = ({ children }) => {
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex h-16 items-center px-4">
             <h1 className="text-xl font-bold text-gray-900">
-              NYC Mobility Explorer
+              NYC UMDE by ADVENTURE
             </h1>
           </div>
           <nav className="flex-1 px-4 py-4 space-y-2">
@@ -113,9 +113,7 @@ const Layout = ({ children }) => {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <div className="text-sm text-gray-500">
-                NYC Urban Mobility Data Explorer
-              </div>
+              <div className="text-sm text-gray-500">NYC UMDE by ADVENTURE</div>
             </div>
           </div>
         </div>

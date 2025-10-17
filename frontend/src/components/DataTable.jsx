@@ -70,17 +70,7 @@ const DataTable = () => {
     return <LoadingSpinner size="large" className="py-12" />;
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-red-600 mb-4">Error loading data</div>
-        <div className="text-gray-500">{error}</div>
-        <button onClick={refetch} className="btn-primary mt-4">
-          Retry
-        </button>
-      </div>
-    );
-  }
+  // Don't return early on error - show the table structure with empty state
 
   return (
     <div className="space-y-6">
@@ -92,7 +82,7 @@ const DataTable = () => {
             Explore and analyze NYC mobility data
           </p>
         </div>
-        <div className="flex items-center space-x-3">
+        {/* <div className="flex items-center space-x-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className="btn-secondary"
@@ -103,7 +93,7 @@ const DataTable = () => {
             <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
             Export
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Search and filters */}
@@ -197,34 +187,49 @@ const DataTable = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {trips.map((trip) => (
-                <tr key={trip.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDateTime(trip.pickupDateTime)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDateTime(trip.dropoffDateTime)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDistance(trip.tripDistance)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(trip.fareAmount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {trip.passengerCount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatSpeed(trip.averageSpeed)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {trip.paymentType}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {trip.pickupBorough} → {trip.dropoffBorough}
+              {error || trips.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="px-6 py-12 text-center">
+                    <div className="text-gray-500 text-lg">
+                      Nothing to show now
+                    </div>
+                    {error && (
+                      <div className="text-sm text-gray-400 mt-2">
+                        Endpoint development in progress...
+                      </div>
+                    )}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                trips.map((trip) => (
+                  <tr key={trip.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDateTime(trip.pickupDateTime)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDateTime(trip.dropoffDateTime)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDistance(trip.tripDistance)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatCurrency(trip.fareAmount)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {trip.passengerCount}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatSpeed(trip.averageSpeed)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {trip.paymentType}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {trip.pickupBorough} → {trip.dropoffBorough}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

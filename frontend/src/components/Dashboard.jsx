@@ -1,16 +1,9 @@
 // Dashboard overview component
 import { useMetrics, useChartData } from "../hooks/useData.jsx";
-import {
-  formatCurrency,
-  formatNumber,
-  formatDuration,
-  formatSpeed,
-} from "../utils/helpers.jsx";
+import { formatNumber, formatDuration } from "../utils/helpers.jsx";
 import MetricsCard from "./MetricsCard";
 import Chart from "./Chart";
 import LoadingSpinner from "./LoadingSpinner";
-import { useEffect } from "react";
-import { dataService } from "../services/dataService.jsx";
 
 const Dashboard = () => {
   const {
@@ -21,23 +14,6 @@ const Dashboard = () => {
   const { fetchChartData: fetchHourlyData } = useChartData("hourly");
   const { fetchChartData: fetchBoroughData } = useChartData("borough");
   const { fetchChartData: fetchPaymentData } = useChartData("payment");
-
-  const getTrips = async () => {
-    try {
-      const response = await dataService.makeRequest(
-        "http://167.99.192.151:5000/trips"
-      );
-      console.log("API DATA");
-      console.log(response);
-    } catch (error) {
-      console.error("Error fetching trips:", error);
-    }
-  };
-
-  useEffect(() => {
-    console.log("API DATA TEST");
-    getTrips();
-  }, []);
 
   if (metricsLoading) {
     return <LoadingSpinner />;
@@ -70,7 +46,7 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Metrics cards */}
+      {/* Metrics cards - using only actual API data */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <MetricsCard
           title="Total Trips"
@@ -79,49 +55,49 @@ const Dashboard = () => {
           color="blue"
         />
         <MetricsCard
-          title="Total Revenue"
-          value={formatCurrency(metrics.totalRevenue)}
-          icon="revenue"
+          title="Total Distance"
+          value={`${metrics.totalDistance?.toFixed(2) || 0} km`}
+          icon="distance"
           color="green"
         />
         <MetricsCard
-          title="Average Fare"
-          value={formatCurrency(metrics.averageFare)}
-          icon="fare"
+          title="Average Distance"
+          value={`${metrics.averageDistance?.toFixed(2) || 0} km`}
+          icon="distance"
           color="purple"
         />
-        <MetricsCard
-          title="Average Distance"
-          value={`${metrics.averageDistance.toFixed(2)} km`}
-          icon="distance"
-          color="orange"
-        />
-      </div>
-
-      {/* Additional metrics */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <MetricsCard
           title="Average Duration"
           value={formatDuration(metrics.averageDuration)}
           icon="duration"
-          color="indigo"
+          color="orange"
         />
+      </div>
+
+      {/* Additional metrics - using only actual API data */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <MetricsCard
           title="Peak Hour"
           value={metrics.peakHour}
           icon="time"
+          color="indigo"
+        />
+        <MetricsCard
+          title="Total Vendors"
+          value={metrics.totalVendors}
+          icon="location"
           color="pink"
         />
         <MetricsCard
-          title="Most Popular Borough"
-          value={metrics.mostPopularBorough}
-          icon="location"
+          title="Max Passengers"
+          value={metrics.maxPassengers}
+          icon="trips"
           color="teal"
         />
         <MetricsCard
-          title="Average Speed"
-          value={formatSpeed(metrics.averageSpeed)}
-          icon="speed"
+          title="Min Passengers"
+          value={metrics.minPassengers}
+          icon="trips"
           color="red"
         />
       </div>
@@ -167,7 +143,7 @@ const Dashboard = () => {
 
         <div className="card">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Trips by Borough
+            Trips by Vendor
           </h3>
           <Chart
             type="doughnut"
@@ -177,7 +153,7 @@ const Dashboard = () => {
               plugins: {
                 title: {
                   display: true,
-                  text: "Trip Distribution by Borough",
+                  text: "Trip Distribution by Vendor",
                 },
                 legend: {
                   position: "bottom",
@@ -188,10 +164,10 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Payment methods chart */}
+      {/* Passenger count chart */}
       <div className="card">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Payment Methods
+          Passenger Count Distribution
         </h3>
         <Chart
           type="bar"
@@ -201,7 +177,7 @@ const Dashboard = () => {
             plugins: {
               title: {
                 display: true,
-                text: "Payment Method Distribution",
+                text: "Passenger Count Distribution",
               },
               legend: {
                 display: false,

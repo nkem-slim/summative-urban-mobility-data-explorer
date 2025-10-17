@@ -12,14 +12,7 @@ const MapView = () => {
     return <LoadingSpinner size="large" className="py-12" />;
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <div className="text-red-600 mb-4">Error loading map data</div>
-        <div className="text-gray-500">{error}</div>
-      </div>
-    );
-  }
+  // Don't return early on error - show the map structure with empty state
 
   return (
     <div className="space-y-6">
@@ -48,17 +41,30 @@ const MapView = () => {
       <div className="card">
         <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
           <div className="text-center">
-            <div className="text-gray-500 mb-2">
-              {mapType === "heatmap" && "🗺️ Heat Map Visualization"}
-              {mapType === "points" && "📍 Trip Points Visualization"}
-              {mapType === "routes" && "🛣️ Trip Routes Visualization"}
-            </div>
-            <p className="text-sm text-gray-400">
-              Interactive map component would be integrated here
-            </p>
-            <p className="text-xs text-gray-400 mt-2">
-              Showing {trips.length} trips
-            </p>
+            {error ? (
+              <>
+                <div className="text-gray-500 text-lg mb-2">
+                  Nothing to show now
+                </div>
+                <p className="text-sm text-gray-400">
+                  Endpoint development in progress...
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="text-gray-500 mb-2">
+                  {mapType === "heatmap" && "🗺️ Heat Map Visualization"}
+                  {mapType === "points" && "📍 Trip Points Visualization"}
+                  {mapType === "routes" && "🛣️ Trip Routes Visualization"}
+                </div>
+                <p className="text-sm text-gray-400">
+                  Interactive map component would be integrated here
+                </p>
+                <p className="text-xs text-gray-400 mt-2">
+                  Showing {trips.length} trips
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -70,30 +76,55 @@ const MapView = () => {
             Map Statistics
           </h3>
           <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Total Trips</span>
-              <span className="text-sm font-medium">{trips.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Average Distance</span>
-              <span className="text-sm font-medium">
-                {(
-                  trips.reduce((sum, trip) => sum + trip.tripDistance, 0) /
-                  trips.length
-                ).toFixed(2)}{" "}
-                km
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-500">Average Fare</span>
-              <span className="text-sm font-medium">
-                $
-                {(
-                  trips.reduce((sum, trip) => sum + trip.fareAmount, 0) /
-                  trips.length
-                ).toFixed(2)}
-              </span>
-            </div>
+            {error ? (
+              <div className="text-center py-4">
+                <div className="text-gray-500 text-sm">Nothing to show now</div>
+                <div className="text-gray-400 text-xs mt-1">
+                  Endpoint development in progress...
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">Total Trips</span>
+                  <span className="text-sm font-medium">{trips.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">
+                    Average Distance
+                  </span>
+                  <span className="text-sm font-medium">
+                    {trips.length > 0
+                      ? (
+                          trips.reduce(
+                            (sum, trip) => sum + (trip.distance || 0),
+                            0
+                          ) / trips.length
+                        ).toFixed(2)
+                      : "0.00"}{" "}
+                    km
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-500">
+                    Average Duration
+                  </span>
+                  <span className="text-sm font-medium">
+                    {trips.length > 0
+                      ? (
+                          trips.reduce(
+                            (sum, trip) => sum + trip.tripDuration,
+                            0
+                          ) /
+                          trips.length /
+                          60
+                        ).toFixed(1)
+                      : "0.0"}{" "}
+                    min
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
