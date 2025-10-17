@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv
 from storage.models import TripRecord
 from requests_ratelimiter import LimiterSession
@@ -7,8 +8,7 @@ from utils.handler import handler
 from flasgger import Swagger
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
-import os
-
+from utils.sort import sort_trip_records
 load_dotenv()
 
 
@@ -80,11 +80,11 @@ def login():
     description: Return object with username and token
     responses:
       200:
-        description:
+        description: Login successful
         schema:
-        type: object
+          type: object
           properties:
-            message:
+            username:
               type: string
               example: "Vincent"
             token:
@@ -147,6 +147,7 @@ def add_trip():
             - dropoff_latitude
             - store_and_fwd_flag
             - trip_duration
+            - distance
           properties:
             id:
               type: string
@@ -206,6 +207,12 @@ def add_trip():
               type: integer
               description: Trip duration in seconds
               example: 900
+            distance:
+              type: number
+              format: float
+              minimum: 0
+              description: Distance in kilometers
+              example: 2.5
     responses:
       201:
         description: Trip successfully created
@@ -321,6 +328,11 @@ def list_trips():
                     type: integer
                     description: Trip duration in seconds
                     example: 900
+                  distance:
+                    type: number
+                    format: float
+                    description: Distance in kilometers
+                    example: 2.5
             pagination:
               type: object
               properties:
@@ -348,18 +360,21 @@ def list_trips():
     # Get pagination parameters from query string
     page = request.args.get('page', 1, type=int)
     limit = request.args.get('limit', 10, type=int)
+    sort_by = request.args.get("sort_by", None, type=str)
 
     # Validate parameters
     if page < 1:
         return jsonify({"error": "Page must be >= 1"}), 400
     if limit < 1 or limit > 1000:
         return jsonify({"error": "Limit must be between 1 and 1000"}), 400
+  
 
     # Calculate offset
     offset = (page - 1) * limit
 
     # Get trips with pagination
     trips = g.storage.list_trips(offset=offset, limit=limit)
+    sorted_trips = sort_trip_records(trips, field=sort_by)
 
     # For database storage
     if isinstance(g.storage, DBStorage):
@@ -371,7 +386,7 @@ def list_trips():
         total = len(all_trips)
 
     response = {
-        "trips": trips,
+        "trips": sorted_trips,
         "pagination": {
             "page": page,
             "limit": limit,
@@ -457,6 +472,11 @@ def get_trip(trip_id):
               type: integer
               description: Trip duration in seconds
               example: 900
+            distance:
+              type: number
+              format: float
+              description: Distance in kilometers
+              example: 2.5
       404:
         description: Trip not found
         schema:
