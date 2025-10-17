@@ -97,7 +97,7 @@ class DataService {
     }
 
     // Get all trips data to calculate metrics
-    const response = await this.makeRequest(`${API_BASE_URL}/trips`);
+    const response = await this.makeRequest(`${API_BASE_URL}/trips?limit=1000`);
     const trips = Array.isArray(response) ? response : response.trips || [];
 
     // Calculate metrics from actual API response data only
@@ -160,7 +160,7 @@ class DataService {
     }
 
     // Get trips data
-    const response = await this.makeRequest(`${API_BASE_URL}/trips`);
+    const response = await this.makeRequest(`${API_BASE_URL}/trips?limit=1000`);
     const trips = Array.isArray(response) ? response : response.trips || [];
 
     switch (chartType) {
@@ -256,7 +256,7 @@ class DataService {
     }
 
     // Get trip from API
-    const response = await this.makeRequest(`${API_BASE_URL}/trips`);
+    const response = await this.makeRequest(`${API_BASE_URL}/trips?limit=1000`);
     const trips = Array.isArray(response) ? response : response.trips || [];
     const trip = trips.find((t) => t.id === id);
     if (!trip) {
@@ -277,7 +277,7 @@ class DataService {
     }
 
     // Get trips data to extract filter options
-    const response = await this.makeRequest(`${API_BASE_URL}/trips`);
+    const response = await this.makeRequest(`${API_BASE_URL}/trips?limit=1000`);
     const trips = Array.isArray(response) ? response : response.trips || [];
 
     const vendors = [...new Set(trips.map((trip) => trip.vendorId))];
@@ -328,7 +328,7 @@ class DataService {
     }
 
     // Get trips data
-    const response = await this.makeRequest(`${API_BASE_URL}/trips`);
+    const response = await this.makeRequest(`${API_BASE_URL}/trips?limit=1000`);
     const trips = Array.isArray(response) ? response : response.trips || [];
 
     if (format === "json") {

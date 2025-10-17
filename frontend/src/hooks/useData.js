@@ -32,7 +32,7 @@ export const useTrips = () => {
 
   const getTrips = async () => {
     const response = await dataService.makeRequest("trips", {
-      options: { limit: 10 },
+      options: { limit: 50 },
     });
     console.log("API DATA");
     console.log(response.json());
